@@ -1,0 +1,10 @@
+<!-- <perfect-scrollbar [usePSClass]="true" class="container"> -->
+<ng-content></ng-content>
+
+<div class='select' *ngIf="selecting"
+  [style.left.px]="selectRect.left"
+  [style.top.px]="selectRect.top"
+  [style.width.px]="selectRect.width"
+  [style.height.px]="selectRect.height"></div>
+
+<!-- </perfect-scrollbar> -->

@@ -1,0 +1,4 @@
+<div [style.width.px]="width" [style.height.px]="height" style="background: transparent;">
+	<ng-content [style.width.px]="width" [style.height.px]="height"></ng-content>
+	<span *ngIf="label" class='label'>{{label}}</span>
+</div>

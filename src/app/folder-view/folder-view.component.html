@@ -1,0 +1,21 @@
+<mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
+
+	<mat-tree-node class="folder-node" *matTreeNodeDef="let node" matTreeNodePadding matTreeNodePaddingIndent="20" [class.active]="node.active">
+		<button class="toggle" mat-icon-button disabled></button>
+		<button class="folder-name mat-button-ellipsis" mat-button (click)="folderClicked(node)">{{node.name}}</button>
+	</mat-tree-node>
+
+	<mat-tree-node class="folder-node" *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding matTreeNodePaddingIndent="20" [class.active]="node.active">
+		<button class="toggle" mat-icon-button [attr.aria-label]="'toggle ' + node.name" matTreeNodeToggle>
+			<!-- <mat-icon class="mat-icon-rtl-mirror">
+				{{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+			</mat-icon> -->
+			<svg width="12" height="12"><use [attr.href]="treeControl.isExpanded(node) ? '#collapsed' : '#expanded'"/></svg>
+		</button>
+		<button class="folder-name mat-button-ellipsis" mat-button (click)="folderClicked(node)">{{node.name}}</button>
+		<!-- <div mat-button (click)="folderClicked(node)">{{node.name}}</div> -->
+		<mat-progress-bar *ngIf="node.isLoading" mode="indeterminate" class="loading-progress-bar">
+		</mat-progress-bar>
+	</mat-tree-node>
+
+</mat-tree>

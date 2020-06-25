@@ -1,0 +1,79 @@
+@import "../../styles/colors";
+
+:host {
+	flex: 0 0 auto;
+	margin: 5px 5px 5px 5px;
+	position: relative;
+	// box-sizing: border-box;
+}
+
+div {
+	position: relative;
+}
+
+// current item dotted outline
+:host.current:after {
+	content: '';
+	position: absolute;
+	outline-offset: 1px;
+	outline: 2px dashed $accent-color;
+	display: block;
+	top: 0px;
+	left: 0px;
+	bottom: 0px;
+	right: 0px;
+	z-index: -1;
+}
+
+// :host.current:before {
+// 	content: '';
+// 	position: absolute;
+// 	display: block;
+// 	top: -3px;
+// 	right: -3px;
+// 	width: 0; height: 0;
+// 	border-top: 13px solid $accent-color;
+// 	border-left: 13px solid transparent;
+// 	z-index: 1;
+// }
+
+// :host.active div {
+// 	outline: 1px solid rgba(0,0,0,0.4);
+// 	outline-offset: -1px;
+// 	z-index: 10;
+// }
+
+// selected item solid outline
+:host.active {
+	// outline is not rendered properly in FireFox, so replacing it with box-shadow
+	// outline: 4px solid $accent-color;
+	box-shadow: 0px 0px 0px 4px $accent-color !important;
+}
+
+// :host.active.current {
+//   outline: 0px none black;
+// }
+
+// :host.active.current:after {
+//   outline: 0px none black;
+//   content: '';
+//   position: absolute;
+//   display: block;
+//   top: -5px;
+//   left: -5px;
+//   bottom: -5px;
+//   right: -5px;
+//   border: 2px solid $accent-color;
+//   //  border-radius: 5px;
+// }
+
+// :host.current {
+//   box-shadow: 0 0 0 8px red;
+// }
+
+.label {
+	color: $text-color;
+	position: absolute;
+	left: 5px;
+	top: 1px;
+}

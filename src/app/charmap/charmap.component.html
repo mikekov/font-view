@@ -1,0 +1,9 @@
+
+<div class="header">
+	<label>Search</label>
+	<input #filter type="text" (input)="setFilter(filter.value)" />
+	<button (click)="setSize(-1)">-</button>
+	<button (click)="setSize(1)">+</button>
+</div>
+
+<virtual-grid #grid class="grid" [cellSize]="getCellSize()" [cellCount]="getGlyphCount()" (draw)="drawGridGlyph($event)" (cellClicked)="onGlyphClicked($event.cell)"></virtual-grid>

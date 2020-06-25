@@ -1,0 +1,9 @@
+button.mat-button-ellipsis > span {
+	overflow-x: hidden;
+	display: inline-block;
+	width: 100%;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	line-height: normal;
+	vertical-align: middle;
+}

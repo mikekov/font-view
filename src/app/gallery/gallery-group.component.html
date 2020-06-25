@@ -1,0 +1,11 @@
+<div *ngIf="title" class='label'>{{title}}
+  <!--<ng-content select=".title" ></ng-content>-->
+</div>
+
+<!-- shim to make virtual group appear big and force scrollbar on parent element -->
+<div *ngIf="_virtual" class="shim" [style.height.px]="_height" [style.width.px]="_width"></div>
+
+<!-- note: 'tabindex' is used to let div handle keyboard input -->
+<div class='container' [class.wrap]='wrapItems' [style.top.px]="_top" [style.left.px]="_left" [class.virtual]="_virtual" tabindex="-1">
+	<ng-content></ng-content>
+</div>

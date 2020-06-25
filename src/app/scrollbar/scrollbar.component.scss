@@ -1,0 +1,89 @@
+@import "../../styles/scrollbar";
+
+
+:host {
+	display: grid;
+	grid-template-columns: auto 1fr auto;
+	grid-template-rows: auto 1fr auto auto;
+}
+
+.track {
+	grid-column: 2 / 3;
+	grid-row: 2 / 3;
+	background-color: $scrollbar-rail-color;
+	&.vert {
+		width: $size;
+		border-top: 2px solid $background-color;
+		border-bottom: 2px solid $background-color;
+	}
+	position: relative;
+}
+
+.thumb {
+	position: absolute;
+	left: 2px;
+	width: $size - 4;
+	background-color: $scrollbar-thumb-color;
+	// border-left: 2px solid $scrollbar-rail-color;
+	// border-right: 2px solid $scrollbar-rail-color;
+	// &.vert {
+	// 	// min-height: $thumb-min-size;
+	// }
+	// &.horz {
+	// 	min-width: $thumb-min-size;
+	// }
+	&:hover, &.active {
+		background-color: $scrollbar-active-thumb-color;
+	}
+}
+
+.page {
+	position: absolute;
+	left: 0;
+	width: $size;
+	// outline: solid 1px yellow;
+}
+
+.pgup {
+	@extend .page;
+	top: 0;
+}
+
+.pgdown {
+	@extend .page;
+	bottom: 0;
+}
+
+.inc {
+	grid-column: 2 / 3;
+	grid-row: 3 / 4;
+	@extend .cs-single-button-vert;
+	border-top: 10px solid $scrollbar-thumb-color;
+	&:hover {
+		border-top-color: $scrollbar-active-thumb-color;
+	}
+	&.disabled{
+		border-top-color: $scrollbar-rail-color;
+	}
+}
+
+.dec {
+	grid-column: 2 / 3;
+	grid-row: 1 / 2;
+	@extend .cs-single-button-vert;
+	border-bottom: 10px solid $scrollbar-thumb-color;
+	&:hover {
+		border-bottom-color: $scrollbar-active-thumb-color;
+	}
+	&.disabled{
+		border-bottom-color: $scrollbar-rail-color;
+	}
+}
+
+button.auto-scroll {
+	grid-column: 2 / 3;
+	grid-row: 4 / 5;
+	margin: 5px 0 0 0;
+	width: $size;
+	height: $size * 1.8;
+}

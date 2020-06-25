@@ -1,0 +1,22 @@
+{
+	"dest": ".",
+	"log": null,
+	"shape": {
+		"dimension": {
+			"precision": 2
+		}
+	},
+	"mode": {
+		"symbol": {
+			"dest": "temp",
+			"sprite": "icons.svg",
+			"prefix": ".%s",
+			"inline": true,
+			"render": {
+				"scss": {
+					"dest": "_icons.css"
+				}
+			}
+		}
+	}
+}

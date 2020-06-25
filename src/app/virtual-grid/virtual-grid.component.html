@@ -1,0 +1,8 @@
+<div class="scroller" (scroll)="vertScroll($event)">
+	<div class="shim" [style.height.px]="_height"></div>
+</div>
+
+<div class="main">
+	<canvas-draw #canvas class="canvas" (refresh)="redraw($event)" (resized)="calcLayout()"></canvas-draw>
+	<div class="scrollbar-width"></div>
+</div>

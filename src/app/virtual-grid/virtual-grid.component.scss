@@ -1,0 +1,41 @@
+:host {
+	position: relative;
+}
+
+.scroller {
+	width: 100%;
+	height: 100%;
+	position: relative;
+	overflow-y: scroll;
+	overflow-x: hidden;
+}
+
+.main {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	overflow-y: hidden;
+	overflow-x: hidden;
+	pointer-events: none;
+}
+
+.shim {
+	position: absolute;
+	opacity: 0;
+	width: 1px;
+	height: 0;
+}
+
+.canvas {
+	width: 100%;
+	height: 100%;
+}
+
+.scrollbar-width {
+	overflow-x: hidden;
+	overflow-y: scroll;
+	visibility: hidden;
+}

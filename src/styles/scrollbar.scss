@@ -1,0 +1,111 @@
+@import "./colors";
+// @import "./icon-font";
+
+$size: 15px;
+$thumb: 13px;
+$thumb-min-size: 28px;
+$thumb-radius: 0px;
+
+// custom scrollbar (.cs) style for Chrome
+
+.cs::-webkit-scrollbar {
+	width: $size;
+	height: $size;
+}
+
+.cs::-webkit-scrollbar-track {
+	background-color: $scrollbar-rail-color;
+	&:vertical {
+		border-top: 2px solid $background-color;
+		border-bottom: 2px solid $background-color;
+	}
+	&:horizontal {
+		border-left: 2px solid $background-color;
+		border-right: 2px solid $background-color;
+	}
+	// &:hover {
+	// 	background-color: $scrollbar-active-rail-color;
+	// }
+}
+
+.cs::-webkit-scrollbar-thumb {
+	background-color: $scrollbar-thumb-color;
+	border: 2px solid $scrollbar-rail-color;
+	// border-top: 2px solid $scrollbar-rail-color;
+	// border-bottom: 2px solid $scrollbar-rail-color;
+	&:vertical {
+		height: $thumb-min-size;
+	}
+	&:horizontal {
+		width: $thumb-min-size;
+	}
+	&:hover {
+		background-color: $scrollbar-active-thumb-color;
+		// border: 2px solid $scrollbar-active-rail-color;
+	}
+}
+
+.cs::-webkit-scrollbar-button:double-button {
+	display: none;
+}
+
+.cs-single-button-vert {
+	width: 0px;
+	// height: 10px;
+	border-left: $size/2 solid transparent;
+	border-right: $size/2 solid transparent;
+}
+
+.cs-single-button-horz {
+	width: 10px;
+	height: 0px;
+	border-top: 8px solid transparent;
+	border-bottom: 8px solid transparent;
+}
+
+.cs::-webkit-scrollbar-button:single-button {
+	&:vertical {
+		// @extend .cs-single-button-vert;
+		width: 0px;
+		height: 10px;
+		border-left: 8px solid transparent;
+		border-right: 8px solid transparent;
+
+		&:increment {
+			border-top: 10px solid $scrollbar-thumb-color;
+			&:hover {
+				border-top-color: $scrollbar-active-thumb-color;
+			}
+		}
+		&:decrement {
+			border-bottom: 10px solid $scrollbar-thumb-color;
+			&:hover {
+				border-bottom-color: $scrollbar-active-thumb-color;
+			}
+		}
+	}
+	&:horizontal {
+		// @extend .cs-single-button-horz;
+		width: 10px;
+		height: 0px;
+		border-top: 8px solid transparent;
+		border-bottom: 8px solid transparent;
+
+		&:increment {
+			border-left: 10px solid $scrollbar-thumb-color;
+			&:hover {
+				border-left-color: $scrollbar-active-thumb-color;
+			}
+		}
+		&:decrement {
+			border-right: 10px solid $scrollbar-thumb-color;
+			&:hover {
+				border-right-color: $scrollbar-active-thumb-color;
+			}
+		}
+	}
+}
+
+.cs::-webkit-scrollbar-corner {
+	background-color: $background-color;
+}

@@ -1,0 +1,19 @@
+:host {
+	display: grid;
+	grid-template-areas:
+		"header"
+		"grid";
+	grid-template-columns: 1fr;
+	grid-template-rows: auto 1fr;
+}
+
+.header {
+	grid-area: header;
+	display: flex;
+	align-items: baseline;
+	border-bottom: 1px solid gray;
+}
+
+.grid {
+	grid-area: grid;
+}

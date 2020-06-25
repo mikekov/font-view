@@ -1,1 +1,37 @@
 /* You can add global styles to this file, and also import other style files */
+@import "./styles/fonts.scss";
+@import "./styles/material.scss";
+@import "./styles/colors.scss";
+
+$font-size: 14px;
+
+body {
+	padding: 0;
+	margin: 0;
+	height: 100%;
+	// display: contents;
+	font-family: Roboto, "Helvetica Neue", sans-serif;
+	font-size: $font-size;
+	user-select: none;
+}
+
+html {
+	height: 100%;
+	background-color: $background-color;
+	color: $text-color;
+	overflow: hidden;
+}
+
+
+button, input[type=text] {
+	font-family: Roboto;
+	font-size: $font-size;
+}
+
+.resizing-horz {
+	cursor: col-resize;
+}
+
+.resizing-vert {
+	cursor: row-resize;
+}

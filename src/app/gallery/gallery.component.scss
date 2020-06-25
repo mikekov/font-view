@@ -1,0 +1,25 @@
+@import "../../styles/colors";
+
+:host {
+	display: block;
+	position: relative;
+	overflow: hidden;
+	&.scroll-x {
+		overflow-x: visible;
+	}
+	&.scroll-y {
+		overflow-y: visible;
+	}
+}
+
+div.select {
+	position: absolute;
+	outline: 1px solid $accent-color;
+	background-color: rgba($accent-color, 0.3);
+
+	left: 0;
+	top: 0;
+	width: 0;
+	height: 0;
+	z-index: 99;
+}

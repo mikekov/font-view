@@ -1,0 +1,10 @@
+<div class="dec" (click)="_scroll(-1)" [class.disabled]="_thumbSize()==0"></div>
+<div #track class="track vert">
+	<div class="pgup" (click)="_scroll(-2)" [style.bottom.%]="100 - _thumbLocation()"></div>
+	<div class="pgdown" (click)="_scroll(2)" [style.top.%]="_thumbLocation()"></div>
+	<div #thumb class="thumb" ktSplitter grow='bottom' (resizing)="_thumbMoved($event)" (resizingAction)="_thumbActive = $event" [currentSize]="_currentPos" [class.vert]="_vert" [class.active]="_thumbActive" [style.top.%]="_thumbLocation()" [style.height.%]="_thumbSize()"></div>
+</div>
+<div class="inc" (click)="_scroll(1)" [class.disabled]="_thumbSize()==0"></div>
+<button *ngIf="showAutoScrollButton" class="auto-scroll" [class.active]="autoScrollOn" (click)="toggleAutoScrollClicked()" tooltip="Auto-scroll" ktTooltip tooltipPlacement="left">
+	<kt-icon id="scroll-down" size="12"></kt-icon>
+</button>
