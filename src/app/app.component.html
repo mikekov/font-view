@@ -8,7 +8,7 @@
 	<div class="space"></div>
 	<label>Size</label>
 	<!-- <mat-slider min="30" max="300" [value]="fontSizeIndex" (change)="setFontSize($event.value)"></mat-slider> -->
-	<input #size type="range" class="font-size" [ngClass]="colorTrack" [value]="fontSizeIndex" [min]="minFontSizeIndex" [max]="maxFontSizeIndex" (input)="setFontSize(size.value)">
+	<input #size type="range" class="font-size app-dark-slider" [ngClass]="colorTrack" [value]="fontSizeIndex" [min]="minFontSizeIndex" [max]="maxFontSizeIndex" (input)="setFontSize(size.value)">
 	<button class="simple-btn" (click)="setFontSize(size.value, -1)">&#x2212;</button>
 	<button class="simple-btn" (click)="setFontSize(size.value, 1)">+</button>
 

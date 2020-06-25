@@ -56,12 +56,9 @@ $contrast: 5% !default;
 	outline: 0;
 }
 
-input[type='range'] {
+input[type='range'].app-dark-slider {
 	border-style: none;
 	background: transparent;
-}
-
-input[type='range'] {
 	-webkit-appearance: none;
 	margin: $thumb-height / 2 0;
 	width: $track-width;
