@@ -9,11 +9,11 @@ import { GalleryItem } from './gallery-item';
 })
 export class GalleryItemComponent implements OnInit {
 
-	@Input() width: string;
-	@Input() height: string;
-	@Input() label: string;
-	@Input() item: GalleryItem;
-	@Input() current: boolean;
+	@Input() width!: number;
+	@Input() height!: number;
+	@Input() label: string | undefined;
+	@Input() item!: GalleryItem;
+	@Input() current: boolean | undefined;
 	@Output() openItem = new EventEmitter<any>();
 
 	constructor(private el: ElementRef) {
@@ -38,7 +38,6 @@ export class GalleryItemComponent implements OnInit {
 	}
 
 	getElementSize(): {width: number, height: number} {
-		// todo: consider box sizing
 		const el = this.el.nativeElement;
 		const style = el.currentStyle || window.getComputedStyle(el);
 		const marginWidth = style ? parseFloat(style.marginLeft) + parseFloat(style.marginRight) : 0;

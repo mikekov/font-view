@@ -164,7 +164,7 @@ export class VirtualGridComponent implements OnInit, AfterViewInit {
 		return null;
 	}
 
-	@ViewChild('canvas') _canvas: CanvasDrawComponent;
+	@ViewChild('canvas') _canvas!: CanvasDrawComponent;
 	_height = 0;
 	_cellSize: { width: number, height: number } | undefined;
 	_layout = {

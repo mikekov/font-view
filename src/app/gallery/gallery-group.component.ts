@@ -17,9 +17,9 @@ import { Rect } from './rect';
 })
 export class GalleryGroupComponent implements OnInit, AfterContentInit {
 
-	@ContentChildren(GalleryItemComponent) content: QueryList<GalleryItemComponent>;
-	@Input() title: string;
-	@Input() group: GalleryGroup;
+	@ContentChildren(GalleryItemComponent) content!: QueryList<GalleryItemComponent>;
+	@Input() title: string | undefined;
+	@Input() group!: GalleryGroup;
 	@Output() clicked = new EventEmitter<any>();
 
 	constructor(private el: ElementRef) {
@@ -88,7 +88,7 @@ export class GalleryGroupComponent implements OnInit, AfterContentInit {
 		return rect;
 	}
 
-	getItemBoundingBox(itemIndex: number): ClientRect {
+	getItemBoundingBox(itemIndex: number): ClientRect | null {
 		if (this._virtual) {
 			const dim = this.calculateSize();
 			if (this.group && dim && dim.complete) {

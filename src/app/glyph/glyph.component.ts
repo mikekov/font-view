@@ -50,7 +50,7 @@ export class GlyphComponent implements OnInit {
 
 	calcLayout() {}
 
-	@ViewChild('canvas') _canvas: CanvasDrawComponent;
+	@ViewChild('canvas') _canvas!: CanvasDrawComponent;
 	_glyph: Glyph;
 	_font: Font;
 }

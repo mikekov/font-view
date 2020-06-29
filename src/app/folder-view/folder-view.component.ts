@@ -99,7 +99,7 @@ export class DynamicDataSource implements DataSource<DynamicFlatNode> {
 		}
 	}
 
-	foldersToNodes(folders: FolderItem[], level?: number): DynamicFlatNode[] | undefined {
+	foldersToNodes(folders: FolderItem[] | undefined | null, level?: number): DynamicFlatNode[] | undefined {
 		if (!folders) return;
 
 		const nodes = folders.map(folder => new DynamicFlatNode(folder, level || 0));
@@ -214,7 +214,7 @@ export class FolderViewComponent implements OnInit {
 		this.treeControl = new FlatTreeControl<DynamicFlatNode>(this.getLevel, this.isExpandable);
 		this.dataSource = new DynamicDataSource(this.treeControl, fileService);
 
-		this.dataSource.data = this.dataSource.foldersToNodes(fileService.getRoot());
+		this.dataSource.data = this.dataSource.foldersToNodes(fileService.getRoot()) || [];
 		// setTimeout(() => {
 			// console.log('refrs');
 			// changes.detectChanges();

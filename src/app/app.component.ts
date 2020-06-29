@@ -9,6 +9,7 @@ import { VirtualGridComponent } from './virtual-grid/virtual-grid.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { GlyphComponent } from './glyph/glyph.component';
 import { CookiesService } from './services/cookies.service';
+import { ProgressBarMode } from '@angular/material/progress-bar';
 
 @Component({
 	selector: 'app-root',
@@ -52,12 +53,12 @@ export class AppComponent implements OnInit {
 				this.operationProgress = 0;
 			}
 			else if (phase === 'next') {
-				this._fonts.push(font);
+				if (font) this._fonts.push(font);
 				// console.log(font.font.names.fullName['en']);
 				this.operationProgress = i / n * 100;
 			}
 			else if (phase === 'end') {
-				this.operationMode = '';
+				delete this.operationMode;
 				delete this._pending;
 				this.sortFonts();
 				this.applyFilter(this.filterText);
@@ -66,7 +67,7 @@ export class AppComponent implements OnInit {
 			else if (phase === 'aborted') {
 				//
 				if (!this._pending) {
-					this.operationMode = '';
+					delete this.operationMode;
 				}
 			}
 		});
@@ -106,10 +107,10 @@ export class AppComponent implements OnInit {
 				version: 'Version',
 				copyright: 'Copyright'
 			};
-			this._fontInfo = _(Object.keys(keys))
-				.map(key => [key, font.font.getEnglishName(key)])
-				.filter(pair => !!pair[1])
-				.map(pair => ({ name: keys[pair[0]], value: pair[1] }))
+			const getKeys = <T>(t: T): (keyof T)[] => Object.keys(t) as (keyof T)[];
+			this._fontInfo = _(getKeys(keys))
+				.filter(key => !!font.font.getEnglishName(key))
+				.map(key => ({ name: keys[key], value: font.font.getEnglishName(key) }))
 				.value();
 			this._fontInfo.push({ name: 'File Name', value: font.fileName });
 			const os2 = font.font.tables.os2;
@@ -191,7 +192,7 @@ export class AppComponent implements OnInit {
 		this._glyphPopup.afterClosed().subscribe(() => { delete this._glyphPopup; });
 	}
 
-	gridSizeChanged(size) {
+	gridSizeChanged(size: { width: number, height: number }) {
 		//
 	}
 
@@ -201,8 +202,8 @@ export class AppComponent implements OnInit {
 	}
 
 	_glyphPopup: MatDialogRef<GlyphComponent> | undefined;
-	@ViewChild('gallery') _gallery: GalleryComponent;
-	@ViewChild('grid') _grid: VirtualGridComponent;
+	@ViewChild('gallery') _gallery!: GalleryComponent;
+	@ViewChild('grid') _grid!: VirtualGridComponent;
 	currentGroup = new GalleryGroup("", 0, []);
 	_groups: GalleryGroup[] = [];
 	galleryItemSize = { w: 200, h: 100 };
@@ -216,7 +217,6 @@ export class AppComponent implements OnInit {
 	filterText = '';
 	sampleText = "abc";
 	operationProgress = 0;
-	operationMode = '';
-	_pending: { cancel: () => void; };
-	// _colorTrack = {"input[type=range]::-webkit-slider-runnable-track": { background: red; }";
+	operationMode: ProgressBarMode | undefined;
+	_pending: { cancel: () => void; } | undefined;
 }

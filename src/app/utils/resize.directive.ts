@@ -16,7 +16,7 @@ export class ResizeDirective {
 
 	// resizing direction: which way to drag the splitter to grow connected element
 	@Input()
-	grow: 'left' | 'right' | 'up' | 'down';
+	grow!: 'left' | 'right' | 'up' | 'down';
 
 	// minimum size to report
 	@Input() minSize = 0;
@@ -73,12 +73,12 @@ export class ResizeDirective {
 	}
 
 	private preventGlobalMouseEvents() {
-		document.body.style['pointer-events'] = 'none';
+		document.body.style.pointerEvents = 'none';
 		document.documentElement.classList.add(this.isHorizontal() ? 'resizing-horz' : 'resizing-vert');
 	}
 
 	private restoreGlobalMouseEvents() {
-		document.body.style['pointer-events'] = 'auto';
+		document.body.style.pointerEvents = 'auto';
 		document.documentElement.classList.remove(this.isHorizontal() ? 'resizing-horz' : 'resizing-vert');
 	}
 
@@ -162,12 +162,12 @@ export class ResizeDirective {
 	}
 
 	private drag = false;
-	private point = null;
-	private storeSize: number;
+	private point: {x: number, y: number} | undefined;
+	private storeSize = 0;
 	readonly el: HTMLElement;
-	private mousemoveListener;
-	private mouseupListener;
+	private mousemoveListener!: (e: MouseEvent) => void;
+	private mouseupListener!: (e: MouseEvent) => void;
 	private _cookie = '';
-	private _component: HTMLElement;
+	private _component: HTMLElement | undefined;
 }
 

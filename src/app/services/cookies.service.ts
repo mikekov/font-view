@@ -1,6 +1,6 @@
 import * as _ from "lodash";
 import { Injectable } from '@angular/core';
-import { cookies, options } from "brownies";
+// import { cookies, options } from "brownies";
 
 @Injectable({
 	providedIn: 'root'
@@ -8,9 +8,9 @@ import { cookies, options } from "brownies";
 export class CookiesService {
 
 	constructor() {
-		cookies[options] = {
-			expires: 9999 * 24 * 3600 // 9999 days
-		};
+		// cookies[options] = {
+		// 	expires: 9999 * 24 * 3600 // 9999 days
+		// };
 	}
 
 	getNumber(key: string, defaultVal: number, min?: number, max?: number): number {
@@ -29,7 +29,7 @@ export class CookiesService {
 	}
 
 	setNumber(key: string, val: number) {
-		if (key) cookies[key] = val;
+		// if (key) cookies[key] = val;
 	}
 
 	getString(key: string, defaultVal: string): string {
@@ -39,10 +39,11 @@ export class CookiesService {
 	}
 
 	setString(key: string, val: string) {
-		if (key) cookies[key] = val;
+		// if (key) cookies[key] = val;
 	}
 
 	getCookie(key: string): any {
-		return key ? cookies[key] : undefined;
+		// return key ? cookies[key] : undefined;
+		return undefined;
 	}
 }

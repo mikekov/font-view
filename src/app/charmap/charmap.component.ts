@@ -11,7 +11,7 @@ import { DrawGrid, VirtualGridComponent } from '../virtual-grid/virtual-grid.com
 export class CharmapComponent implements OnInit {
 
 	@Input()
-	set font(font: opentype.Font | null) {
+	set font(font: opentype.Font | null | undefined) {
 		if (font !== this._font) {
 			this._font = font;
 			this.applyFilter();
@@ -92,6 +92,7 @@ export class CharmapComponent implements OnInit {
 		if (this._font) {
 			return this._font.glyphs.get(i);
 		}
+		return;
 	}
 
 	drawGridGlyph(event: DrawGrid) {
@@ -131,6 +132,6 @@ export class CharmapComponent implements OnInit {
 	_cellSize = { width: 40, height: 50 };
 	_filter: string | null | undefined;
 	_glyphs: opentype.Glyph[] | null = null;
-	@ViewChild('grid') _grid: VirtualGridComponent;
+	@ViewChild('grid') _grid!: VirtualGridComponent;
 	_sizeIndex = 0;
 }

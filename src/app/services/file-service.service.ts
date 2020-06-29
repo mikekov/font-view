@@ -10,7 +10,7 @@ export interface FolderItem {
 	path: string;
 	isExpandable: boolean;
 	children: FolderItem[] | null;
-	read(cb: () => void);
+	read(cb: () => void): void;
 }
 
 class Folder implements FolderItem {
@@ -102,7 +102,7 @@ export class FileService {
 		return null;
 	}
 
-	isExpandable(path): boolean {
+	isExpandable(path: string): boolean {
 		return false;
 	}
 
@@ -126,7 +126,7 @@ export class FileService {
 		});
 	}
 
-	getFonts(path: string, cb: (phase: 'start'|'next'|'end'|'aborted', index: number, total: number, font: FontObject) => void): {cancel: () => boolean} {
+	getFonts(path: string, cb: (phase: 'start'|'next'|'end'|'aborted', index: number, total: number, font: FontObject | null) => void): {cancel: () => boolean} {
 		const dir = path;
 		const require = window.require;
 		const { resolve, extname } = require('path');
@@ -134,7 +134,7 @@ export class FileService {
 		let abort = false;
 		const operation = {cancel: () => abort = true};
 
-		async function* getFiles(dir: string) {
+		async function* getFiles(dir: string): any {
 			const dirents = await readdir(dir, { withFileTypes: true });
 			if (abort) return;
 			for (const dirent of dirents) {

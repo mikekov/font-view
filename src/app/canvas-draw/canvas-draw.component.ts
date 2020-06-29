@@ -7,7 +7,7 @@ export interface DrawOptions {
 	ctx: CanvasRenderingContext2D;
 	width: number;
 	height: number;
-	clear(color: string);
+	clear(color: string): void;
 }
 
 @Component({
@@ -89,7 +89,9 @@ export class CanvasDrawComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	redraw() {
-		const ctx = this._canvas?.getContext("2d");
+		if (!this._canvas) return;
+
+		const ctx = this._canvas.getContext("2d");
 		if (ctx) {
 			const r = window.devicePixelRatio || 1;
 			ctx.setTransform(r, 0, 0, r, 0, 0);
@@ -114,13 +116,13 @@ export class CanvasDrawComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	ngOnDestroy(): void {
-		if (this._resize) {
+		if (this._resize && this._canvas) {
 			this._resize.unobserve(this._canvas);
 		}
 	}
 
-	@ViewChild('canvas') _canvasRef: ElementRef;
-	_canvas: HTMLCanvasElement;
+	@ViewChild('canvas') _canvasRef!: ElementRef;
+	_canvas: HTMLCanvasElement | undefined;
 	_font: opentype.Font | undefined;
 	_fontSize = 50;
 	_text = "abcg";

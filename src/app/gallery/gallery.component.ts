@@ -1,9 +1,9 @@
 import {
 	Component, OnInit, Input, Output, EventEmitter, ElementRef, HostBinding, HostListener, OnDestroy,
-	ContentChildren, AfterContentInit, AfterViewInit, QueryList, AfterViewChecked, OnChanges, NgZone
+	ContentChildren, AfterContentInit, AfterViewInit, QueryList, AfterViewChecked, OnChanges, NgZone, SimpleChanges
 } from '@angular/core';
 import * as _ from 'lodash';
-import { interval } from 'rxjs';
+import { interval, Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { GalleryItem } from './gallery-item';
 import { GalleryGroup } from './gallery-group';
@@ -54,7 +54,7 @@ class GallerySelectionImpl implements GallerySelectionInfo {
 		return false;
 	}
 
-	private _selected: GalleryItem[];
+	private _selected: GalleryItem[] | undefined;
 }
 
 @Component({
@@ -67,7 +67,6 @@ class GallerySelectionImpl implements GallerySelectionInfo {
 export class GalleryComponent implements OnInit, AfterContentInit, AfterViewInit, AfterViewChecked, OnChanges, OnDestroy {
 	@Output() selection = new EventEmitter<GallerySelectionInfo>();
 	@Output() itemVisibilityChanged = new EventEmitter<void>();
-	@Input() title: string;
 	@Input()
 	set items(v: GalleryItem[]) {
 		this._items = v;
@@ -100,7 +99,7 @@ export class GalleryComponent implements OnInit, AfterContentInit, AfterViewInit
 		}
 	}
 	// track mouse and select on 'mouse over'
-	@Input() trackSelection: boolean;
+	@Input() trackSelection = false;
 	// if true, first item will be selected after refresh
 	@Input() initialSelection = true;
 	@Input()
@@ -119,7 +118,7 @@ export class GalleryComponent implements OnInit, AfterContentInit, AfterViewInit
 		this._virtualGrid = on;
 	}
 
-	@ContentChildren(GalleryGroupComponent) elements: QueryList<GalleryGroupComponent>;
+	@ContentChildren(GalleryGroupComponent) elements!: QueryList<GalleryGroupComponent>;
 
 	constructor(
 		el: ElementRef,
@@ -205,7 +204,7 @@ export class GalleryComponent implements OnInit, AfterContentInit, AfterViewInit
 	// 	console.log('after check');
 	// }
 
-	ngOnChanges(arg) {
+	ngOnChanges(arg: SimpleChanges) {
 		if (this.initialSelection && (arg.items || arg.groups)) {
 			// wait for HTML to reflect changes before selecting something
 			setTimeout(() => {
@@ -275,6 +274,7 @@ export class GalleryComponent implements OnInit, AfterContentInit, AfterViewInit
 
 			return true;
 		}
+		return false;
 	}
 
 	@HostListener('mousemove', ['$event'])
@@ -323,7 +323,7 @@ export class GalleryComponent implements OnInit, AfterContentInit, AfterViewInit
 	}
 
 	@HostListener('click', ['$event'])
-	galleryClicked(e) {
+	galleryClicked(e: Event) {
 		//    (this.el.nativeElement as HTMLElement).focus();
 		// todo: start lasso select
 		// console.log('gallery', e);
@@ -339,7 +339,7 @@ export class GalleryComponent implements OnInit, AfterContentInit, AfterViewInit
 
 	@HostListener('mousewheel', ['$event'])
 	mousewheel(ev: WheelEvent): void {
-		const delta = ev['wheelDelta'] || ev.deltaY;
+		const delta = /*ev['wheelDelta'] ||*/ ev.deltaY;
 		if (this.scrollItems(delta)) {
 			ev.preventDefault();
 		}
@@ -354,12 +354,12 @@ export class GalleryComponent implements OnInit, AfterContentInit, AfterViewInit
 		return false;
 	}
 	// make gallery focusable
-	@HostBinding('tabindex') 0;
+	@HostBinding('tabindex') _tabIndex = 0;
 
 	@HostBinding('scrollTop') scrollTop = 0;
 	@HostBinding('scrollLeft') scrollLeft = 0;
 	@HostListener('scroll', ['$event.target'])
-	scrolled(el) {
+	scrolled(el: HTMLElement) {
 		this.scrollPosX = el.scrollLeft;
 		this.scrollPosY = el.scrollTop;
 		this._scrolling.next();
@@ -387,9 +387,9 @@ export class GalleryComponent implements OnInit, AfterContentInit, AfterViewInit
 	// test = () => {
 	//   console.log('test hit');
 	// }
-	decodeShiftCtrl(shift: boolean, control: boolean): [boolean, boolean] {
-		let extendSelection = shift;
-		let moveCurrent = control;
+	decodeShiftCtrl(shift: boolean | undefined, control: boolean | undefined): [boolean, boolean] {
+		let extendSelection = !!shift;
+		let moveCurrent = !!control;
 		if (this._selectionMode === GallerySelectionMode.Single) {
 			extendSelection = false;
 			moveCurrent = false;
@@ -412,7 +412,7 @@ export class GalleryComponent implements OnInit, AfterContentInit, AfterViewInit
 	@HostListener('keydown.control.ArrowRight', [RIGHT, '{control: true}'])
 	@HostListener('keydown.space',              [NONE,  '{}'])
 	@HostListener('keydown.control.space',      [NONE,  '{control: true}'])
-	private keydown(dir: string, modifiers) {
+	private keydown(dir: string, modifiers: {shift?: boolean, control?: boolean}) {
 		const [extendSelection, moveCurrent] = this.decodeShiftCtrl(modifiers.shift, modifiers.control);
 		this.goTo(parseInt(dir, 10) as Direction, extendSelection, moveCurrent);
 		return false; // prevent default
@@ -499,7 +499,7 @@ export class GalleryComponent implements OnInit, AfterContentInit, AfterViewInit
 		const scrollLeft = this.el.scrollLeft;
 		if (scrollLeft !== x) {
 			if (this.smooth) {
-				this.smooth.unsubscribe();
+				this.smooth?.unsubscribe();
 				this.smooth = null;
 			}
 
@@ -515,7 +515,7 @@ export class GalleryComponent implements OnInit, AfterContentInit, AfterViewInit
 					this.scrollLeft = start + Math.sin(i * Math.PI / 2 / steps) * delta;
 					if (i >= steps) {
 						this.scrollLeft = x;
-						this.smooth.unsubscribe();
+						this.smooth?.unsubscribe();
 						this.smooth = null;
 					}
 				});
@@ -523,7 +523,7 @@ export class GalleryComponent implements OnInit, AfterContentInit, AfterViewInit
 		}
 	}
 
-	private smooth = null;
+	private smooth: Subscription | null = null;
 
 	private visibilityChanged() {
 		// console.log('refresh visibility');
@@ -618,7 +618,7 @@ export class GalleryComponent implements OnInit, AfterContentInit, AfterViewInit
 	}
 
 	// find group containing itemIndex item
-	findGroup(itemIndex: number): [GalleryGroupComponent, number, GalleryGroupComponent[]] {
+	findGroup(itemIndex: number): [GalleryGroupComponent | null, number, GalleryGroupComponent[] | null] {
 		const groupElements = this.elements.toArray();
 		const index = _.findIndex(groupElements, el => itemIndex >= el.group.start && itemIndex < el.group.end);
 		if (index >= 0 && index < groupElements.length) {
@@ -627,7 +627,7 @@ export class GalleryComponent implements OnInit, AfterContentInit, AfterViewInit
 		return [null, -1, null];
 	}
 
-	getItemBoundingBox(itemIndex: number): ClientRect {
+	getItemBoundingBox(itemIndex: number): ClientRect | null {
 		const [groupElement, groupIndex, groups] = this.findGroup(itemIndex);
 		if (!groupElement) return null;
 
@@ -656,7 +656,7 @@ export class GalleryComponent implements OnInit, AfterContentInit, AfterViewInit
 	// return index of the item in the next/previous row
 	navigateToRow(itemIndex: number, nextRow: boolean): number {
 		const pos = this.findPosition(itemIndex);
-		if (!pos) return -1;
+		if (!pos || !pos.groups || !pos.groupElement) return -1;
 
 		const newRow = nextRow ? pos.row + 1 : pos.row - 1;
 		if (newRow < 0) {
@@ -823,5 +823,5 @@ export class GalleryComponent implements OnInit, AfterContentInit, AfterViewInit
 	private _scrolling = new EventEmitter<void>();
 	private _virtualGrid = false;
 	private _destroyed = false;
-	private resizeObserver: ResizeObserver;
+	private resizeObserver: ResizeObserver | undefined;
 }

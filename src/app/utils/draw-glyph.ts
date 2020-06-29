@@ -11,7 +11,7 @@ export interface GlyphDrawingOptions {
 	showIndex?: boolean;
 	showName?: boolean | 'long';
 	drawBorder?: boolean;
-	getGlyph?: (i: number) => opentype.Glyph;
+	getGlyph?: (i: number) => opentype.Glyph | undefined;
 }
 
 export function drawGlyphs(glyphFrom: number, glyphTo: number, font: Font, options: GlyphDrawingOptions) {

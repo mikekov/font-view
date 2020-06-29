@@ -37,7 +37,7 @@ export class FontTileComponent implements OnInit {
 	ngOnInit(): void {
 	}
 
-	@ViewChild('canvas') _canvas: CanvasDrawComponent;
+	@ViewChild('canvas') _canvas!: CanvasDrawComponent;
 	_font: opentype.Font | undefined;
 	_fontSize = 50;
 	_text = "abcg";
