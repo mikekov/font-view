@@ -6,7 +6,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 ## Development server
 
-Run `npm start` for a dev server. Start Electron with "npm dbg". F5 to debug with VS Code.
+Run `npm start` for a dev server. Start Electron with `npm dbg`. F5 to debug with VS Code.
 
 ## Code scaffolding
 
