@@ -167,6 +167,6 @@ input[type='range'].app-dark-slider {
 // classes to color the track from 0% all the way to 100% in 1% increments
 @for $i from 0 through 100 {
 	input[type=range].track-to-#{$i}::-webkit-slider-runnable-track {
-		background: linear-gradient(to right, $accent-color, $accent-color percentage($i/100), $track-color percentage($i/100+0.001), $track-color 100%);
+		background: linear-gradient(to right, $accent-color-light, $accent-color-light percentage($i/100), $track-color percentage($i/100+0.001), $track-color 100%);
 	}
 }

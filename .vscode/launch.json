@@ -22,6 +22,8 @@
 			"request": "launch",
 			// "trace": "verbose",
 			"port": 9222,
+			// "runtimeExecutable": "npm run dbg",
+			// "runtimeExecutable": "pwd",
 			"runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
 			// "runtimeExecutable": "${workspaceRoot}/node_modules/electron/dist/electron",
 			"windows": {

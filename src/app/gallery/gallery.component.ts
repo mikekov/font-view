@@ -176,7 +176,8 @@ export class GalleryComponent implements OnInit, AfterContentInit, AfterViewInit
 		// this.el.addEventListener('DOMMouseScroll', this.onMouseWheel, false);	// for Firefox
 		// this.el.addEventListener('mousewheel', this.onMouseWheel, false);
 
-		this.resizeObserver = new ResizeObserver(() => {
+		this.resizeObserver = new ResizeObserver((x: any) => {
+			// console.log('resize', x);
 			this.zone.run(() => setTimeout(() => this.loadVisibleImages(), 10));
 		});
 		this.resizeObserver.observe(this.el);

@@ -1,6 +1,6 @@
 import { CollectionViewer, SelectionChange, DataSource } from '@angular/cdk/collections';
 import { FlatTreeControl } from '@angular/cdk/tree';
-import { Component, Injectable, OnInit, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
+import { Component, Injectable, OnInit, ChangeDetectorRef, Output, EventEmitter, AfterViewInit, Input } from '@angular/core';
 import { BehaviorSubject, merge, Observable, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { FileService, FolderItem } from '../services/file-service.service';
@@ -207,14 +207,25 @@ export class DynamicDataSource implements DataSource<DynamicFlatNode> {
 	templateUrl: './folder-view.component.html',
 	styleUrls: ['./folder-view.component.scss']
 })
-export class FolderViewComponent implements OnInit {
+export class FolderViewComponent implements OnInit, AfterViewInit {
 	@Output() selectFolder = new EventEmitter<string>();
 
-	constructor(fileService: FileService, changes: ChangeDetectorRef) {
+	@Input()
+	set rootPath(p: string) {
+		if (p && p !== this._rootPath) {
+			const folder = this.fileService.getFolder(p);
+			this._rootPath = p;
+			this.dataSource.data = this.dataSource.foldersToNodes([folder]) || [];
+			const root = this.dataSource.data[0];
+			if (root) this.treeControl.expand(root);
+		}
+	}
+
+	constructor(private fileService: FileService, private changes: ChangeDetectorRef) {
 		this.treeControl = new FlatTreeControl<DynamicFlatNode>(this.getLevel, this.isExpandable);
 		this.dataSource = new DynamicDataSource(this.treeControl, fileService);
 
-		this.dataSource.data = this.dataSource.foldersToNodes(fileService.getRoot()) || [];
+		// this.dataSource.data = this.dataSource.foldersToNodes(fileService.getRoot()) || [];
 		// setTimeout(() => {
 			// console.log('refrs');
 			// changes.detectChanges();
@@ -234,6 +245,15 @@ export class FolderViewComponent implements OnInit {
 		return _nodeData.expandable;
 	}
 
+	ngAfterViewInit(): void {
+		// const root = this.treeControl.dataNodes[0];
+		const root = this.dataSource.data[0];
+		// if (root) this.dataSource.toggleNode(root, true);
+		if (root) this.treeControl.expand(root);
+		// this.treeControl.expandAll();
+		this.changes.detectChanges();
+	}
+
 	ngOnInit(): void {
 	}
 
@@ -246,4 +266,6 @@ export class FolderViewComponent implements OnInit {
 			this.selectFolder.next(path);
 		}
 	}
+
+	_rootPath = '';
 }

@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { DrawOptions, CanvasDrawComponent } from '../canvas-draw/canvas-draw.component';
+import { FontObject } from '../utils/font-object';
 
 @Component({
 	selector: 'font-tile',
@@ -9,7 +10,7 @@ import { DrawOptions, CanvasDrawComponent } from '../canvas-draw/canvas-draw.com
 export class FontTileComponent implements OnInit {
 
 	@Input()
-	set font(f: opentype.Font) {
+	set font(f: FontObject) {
 		this._font = f;
 	}
 
@@ -29,8 +30,10 @@ export class FontTileComponent implements OnInit {
 
 	redraw(opt: DrawOptions) {
 		if (this._font) {
+			opt.clear('white');
 			const size = this._fontSize;
-			this._font.draw(opt.ctx, this._text, size * 0.10, size, size);
+			const bbox = this._font.getPath(this._text, 0, 0, size).getBoundingBox();
+			this._font.draw(opt.ctx, this._text, -bbox.x1 + size * 0.05, size, size);
 		}
 	}
 
@@ -38,7 +41,7 @@ export class FontTileComponent implements OnInit {
 	}
 
 	@ViewChild('canvas') _canvas!: CanvasDrawComponent;
-	_font: opentype.Font | undefined;
+	_font: FontObject | undefined;
 	_fontSize = 50;
 	_text = "abcg";
 }

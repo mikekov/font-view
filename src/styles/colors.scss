@@ -1,4 +1,9 @@
-$accent-color: #2c6bf1;
+@import '~@angular/material/theming';
+
+$accent-color: map-get($mat-indigo, 500);
+$accent-color-light: map-get($mat-indigo, A200);
+
+// $accent-color: #2c6bf1;
 $text-color: #000;
 $accent-text-color: #fff;
 $dim-text-color: #444;

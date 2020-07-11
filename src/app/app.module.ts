@@ -18,6 +18,7 @@ import { FolderViewComponent } from './folder-view/folder-view.component';
 import { ResizeDirective } from './utils/resize.directive';
 import { GlyphComponent } from './glyph/glyph.component';
 import { CharmapComponent } from './charmap/charmap.component';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
 	declarations: [
@@ -31,7 +32,7 @@ import { CharmapComponent } from './charmap/charmap.component';
 		CharmapComponent
 	],
 	imports: [
-		BrowserModule, GalleryModule, BrowserAnimationsModule,
+		BrowserModule, GalleryModule, BrowserAnimationsModule, HttpClientModule,
 		MatProgressBarModule, MatSliderModule, MatTreeModule, MatIconModule, MatButtonModule,
 		MatDialogModule, MatBadgeModule, MatChipsModule
 	],

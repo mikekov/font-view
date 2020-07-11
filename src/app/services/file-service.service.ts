@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { IpcRenderer } from 'electron';
 import * as opentype from 'opentype.js';
-import { FontObject } from '../utils/font-object';
+import { FontObject, FontObjectImpl, FontObjectEmpty } from '../utils/font-object';
 import * as path from "path";
 import * as fs from "fs";
 
@@ -94,6 +94,10 @@ export class FileService {
 */
 	ipc: IpcRenderer;
 
+	getFolder(syspath: string): FolderItem {
+		return new Folder(path.basename(syspath), syspath);
+	}
+
 	getRoot(): FolderItem[] {
 		return [new Folder(path.basename(this._root), this._root)];
 	}
@@ -110,9 +114,9 @@ export class FileService {
 		return this._root;
 	}
 
-	_root = "/mnt/rox/archive/Fonty";
-	// _root = "/mnt/rox/archive/Fonty/Speciality";
-	// _root = "/mnt/rox/archive/Fonty/Sanserif/Accius";
+	// _root = "/usr/share/fonts";
+	_root = "/home/mike/fonts";
+	// _root = "/mnt/rox/archive/Fonty";
 
 	xgetFolders(path?: string) {
 		//
@@ -175,12 +179,15 @@ export class FileService {
 				try {
 					const font = opentype.parse(data.buffer);
 					if (font && !abort) {
-						cb('next', index, fontFiles.length, new FontObject(font, file));
+						cb('next', index, fontFiles.length, new FontObjectImpl(font, file));
 					}
 				}
 				catch (err) {
 					// todo
 					console.warn('error loading font', file, err);
+					if (!abort) {
+						cb('next', index, fontFiles.length, new FontObjectEmpty(err, file));
+					}
 				}
 				index++;
 
@@ -194,16 +201,5 @@ export class FileService {
 		})();
 
 		return operation;
-
-		// cb(files.l)
-		// fs.readdir("/mnt/rox/archive/Fonty/Sanserif/", (err, files) => {
-		// 	if (err) {
-		// 		console.warn(err);
-
-		// 	}
-		// 	else {
-		// 		//
-		// 	}
-		// });
 	}
 }

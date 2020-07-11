@@ -1,4 +1,4 @@
-<div class="scroller" (scroll)="vertScroll($event)">
+<div class="scroller" (scroll)="vertScroll($event)" [scrollTop]="_scrollTop">
 	<div class="shim" [style.height.px]="_height"></div>
 </div>
 

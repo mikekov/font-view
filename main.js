@@ -18,8 +18,8 @@ function createWindow() {
 	// load the dist folder from Angular
 	win.loadURL(
 		url.format({
-			pathname: "//localhost:4444", //path.join(__dirname, `/dist/index.html`),
-			protocol: "http:",
+			pathname: path.join(__dirname, `/index.html`),
+			protocol: "file:",
 			slashes: true
 		})
 	);

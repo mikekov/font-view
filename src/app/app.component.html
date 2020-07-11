@@ -13,11 +13,21 @@
 	<button class="simple-btn" (click)="setFontSize(size.value, 1)">+</button>
 
 	<div class="space"></div>
+	<label>Sort</label>
+	<button class="radio-btn left" [class.selected]="_sortBy === 'name'" (click)="sortBy('name')" title="Sort by font name">
+		<svg class="ico" width="20" height="16"> <use href="#tag" /> </svg>
+	</button>
+	<button class="radio-btn" [class.selected]="_sortBy === 'weight'" (click)="sortBy('weight')" title="Sort by font weight">
+		<svg class="ico" width="24" height="16"> <use href="#weight" /> </svg>
+	</button>
+	<button class="radio-btn right" [class.selected]="_sortBy === 'proportions'" (click)="sortBy('proportions')" title="Sort fonts from compressed to extended">
+		<svg class="ico" width="24" height="16"> <use href="#proportions" /> </svg>
+	</button>
+
+	<div class="space"></div>
 	<label>Fonts</label>
 	<div class="border-wrapper pill">
-		<svg class="icon icon-left" width="16" height="16">
-			<use href="#magnifying-glass" />
-		</svg>
+		<svg class="icon icon-left" width="16" height="16"> <use href="#magnifying-glass" /> </svg>
 		<input class="quick-find dark-edit" #find type="text" [value]="filterText" (input)="setFilterText(find.value)">
 	</div>
 
@@ -25,7 +35,11 @@
 </div>
 
 <div #folderPanel class="folder-view">
-	<folder-view (selectFolder)="loadFonts($event)"></folder-view>
+	<div class="panel-header">
+		<span class="path">{{getDisplayPath()}}</span>
+		<button class="btn" mat-flat-button (click)="selectFontFolder()">...</button>
+	</div>
+	<folder-view #folders [rootPath]="_rootPath" class="folders" (selectFolder)="loadFonts($event)"></folder-view>
 </div>
 
 <div class="separator sep0" resizePanel [component]="folderPanel" grow="right" cookie="folderPanelWidth"></div>
@@ -34,7 +48,7 @@
 	<mk-gallery-group [group]="currentGroup">
 		<mk-gallery-item *ngFor="let item of currentGroup.items" [item]="item" [width]="galleryItemSize.w" [height]="galleryItemSize.h">
 			<div *ngIf="item.tag as f" class="card-item">
-				<font-tile class="font" [font]="f.font" [size]="fontSize" [text]="sampleText"></font-tile>
+				<font-tile class="font" [font]="f" [size]="fontSize" [text]="sampleText"></font-tile>
 				<span class="font-name">{{f.fontName}}</span>
 			</div>
 		</mk-gallery-item>
@@ -49,8 +63,12 @@
 		<span class="value">{{line.value}}</span>
 		<div *ngIf="!isLast" class="line"></div>
 	</ng-container>
+	<div class="buttons">
+		<button mat-flat-button color="primary" class="push-btn" (click)="installFonts()">Install</button>
+		<button mat-flat-button class="push-btn" (click)="uninstallFonts()">Uninstall</button>
+	</div>
 </div>
 
 <div class="separator sep2" resizePanel [component]="infoPanel" grow="down" cookie="glyphPanelHeight"></div>
 
-<char-map class="glyph-panel" [font]="_selectedFont?.font" (glyphClicked)="openGlyphPopup($event)" (cellSizeChanged)="gridSizeChanged($event)"></char-map>
+<char-map class="glyph-panel" [font]="_selectedFont" (glyphClicked)="openGlyphPopup($event)" [cellSizeIndex]="_gridCellSize" (cellSizeChanged)="gridSizeChanged($event)"></char-map>

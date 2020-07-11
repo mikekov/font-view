@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import { Directive, Input, Output, HostListener, ElementRef, EventEmitter } from '@angular/core';
 import { CookiesService } from '../services/cookies.service';
+import { Subscription } from 'rxjs';
 
 // resizing panel directive can be attached to a splitter that moves to adjust size of an adjacent element
 
@@ -47,7 +48,8 @@ export class ResizeDirective {
 	@Input()
 	set cookie(key: string) {
 		this._cookie = key;
-		this.restoreSize();
+		if (this._sub) this._sub.unsubscribe();
+		this._sub = this.cookies.ready.subscribe(() => this.restoreSize());
 	}
 
 	@HostListener('mousedown', ['$event'])
@@ -169,5 +171,6 @@ export class ResizeDirective {
 	private mouseupListener!: (e: MouseEvent) => void;
 	private _cookie = '';
 	private _component: HTMLElement | undefined;
+	private _sub: Subscription | undefined;
 }
 

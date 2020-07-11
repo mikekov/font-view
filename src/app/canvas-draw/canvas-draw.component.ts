@@ -1,9 +1,10 @@
 // tslint:disable-next-line:no-reference
 /// <reference path="../utils/resize-observer.d.ts" />
-import { Component, OnInit, Input, ViewChild, AfterViewInit, Type, ElementRef, OnDestroy, Output, EventEmitter } from '@angular/core';
-// import { ResizeObserver } from '../utils/resize-observer';
+import { Component, OnInit, Input, ViewChild, AfterViewInit, Type, ElementRef, OnDestroy, Output, EventEmitter, NgZone } from '@angular/core';
+import { dir } from 'console';
 
 export interface DrawOptions {
+	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
 	width: number;
 	height: number;
@@ -17,30 +18,13 @@ export interface DrawOptions {
 })
 export class CanvasDrawComponent implements OnInit, AfterViewInit, OnDestroy {
 
-	@Input()
-	set font(f: opentype.Font) {
-		this._font = f;
-	}
-
-	@Input()
-	set size(s: number) {
-		this._fontSize = s;
-		this.redraw();
-	}
-
-	@Input()
-	set text(t: string) {
-		this._text = t;
-		this.redraw();
-	}
-
 	@Output()
 	refresh = new EventEmitter<DrawOptions>();
 
 	@Output()
 	resized = new EventEmitter<void>();
 
-	constructor() { }
+	constructor(private zone: NgZone) { }
 
 	get width(): number {
 		return this._canvas?.clientWidth || 0;
@@ -51,45 +35,67 @@ export class CanvasDrawComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	dirty() {
-		setTimeout(() => { this.redraw(); }, 0);
+		if (this._dirty) window.clearTimeout(this._dirty);
+		this._dirty = window.setTimeout(() => { this.redraw(); }, 0);
 	}
 
 	ngAfterViewInit(): void {
 		const canvas = this._canvasRef.nativeElement;
 		this._canvas = canvas;
 
-		this.resize();
+		const dirty = this.resize();
 
 		// repaint canvas after it's been resized
-		this._resize = new ResizeObserver(() => { this.resize(); this.redraw(); });
+		this._resize = new ResizeObserver((r: any) => {
+			// console.log(r[0].contentRect.width, r);
+			this.zone.run(() => {
+				this.resize();
+				// this.redraw();
+				this.dirty();
+			});
+		});
 		this._resize.observe(canvas);
 
-		const bbox = canvas.getBoundingClientRect();
-		const r = window.devicePixelRatio || 1;
-		canvas.width = bbox.width * r;
-		canvas.height = bbox.height * r;
-		this.redraw();
+		if (!dirty) this.dirty();
 	}
 
-	resize() {
-		if (!this._canvas) return;
+	resize(): boolean {
+		if (this.sizeChanged()) {
+			this.resized.next();
+			this.dirty();
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	sizeChanged(): boolean {
+		if (!this._canvas) return false;
 
 		const host = this._canvas.parentElement;
-		const h = host?.clientHeight;
-		const w = host?.clientWidth;
+		let h = host?.clientHeight;
+		let w = host?.clientWidth;
 		const r = window.devicePixelRatio || 1;
 		// const box = this._canvas.getBoundingClientRect();
 		if (w && h) {
-			this._canvas.width = w * r;
-			this._canvas.height = h * r;
+			w = Math.floor(w * r);
+			h = Math.floor(h * r);
+			const EPS = 0.05;
+			if (Math.abs(this._canvas.width - w) > EPS || Math.abs(this._canvas.height - h) > EPS) {
+				this._canvas.width = w;
+				this._canvas.height = h;
+				return true;
+			}
 		}
-		// this._canvas.width
-		this.resized.next();
-		this.dirty();
+		return false;
 	}
 
 	redraw() {
 		if (!this._canvas) return;
+
+		// verify that canvas size is updated; resize observer can miss changes
+		if (this.resize()) return;
 
 		const ctx = this._canvas.getContext("2d");
 		if (ctx) {
@@ -100,6 +106,7 @@ export class CanvasDrawComponent implements OnInit, AfterViewInit, OnDestroy {
 			const height = this._canvas.height / r;
 
 			this.refresh.next({
+				canvas: this._canvas,
 				ctx,
 				width,
 				height,
@@ -123,8 +130,6 @@ export class CanvasDrawComponent implements OnInit, AfterViewInit, OnDestroy {
 
 	@ViewChild('canvas') _canvasRef!: ElementRef;
 	_canvas: HTMLCanvasElement | undefined;
-	_font: opentype.Font | undefined;
-	_fontSize = 50;
-	_text = "abcg";
 	_resize: ResizeObserver | undefined;
+	_dirty: number | undefined;
 }

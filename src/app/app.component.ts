@@ -1,37 +1,52 @@
 import * as _ from "lodash";
-import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, OnDestroy, NgZone } from '@angular/core';
 import { FileService } from './services/file-service.service';
 import { GalleryGroup } from './gallery/gallery-group';
 import { GalleryItem } from './gallery/gallery-item';
 import { GalleryComponent, GallerySelectionInfo } from './gallery/gallery.component';
-import { FontObject } from './utils/font-object';
+import { FontObject, ExtGlyph } from './utils/font-object';
 import { VirtualGridComponent } from './virtual-grid/virtual-grid.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { GlyphComponent } from './glyph/glyph.component';
 import { CookiesService } from './services/cookies.service';
 import { ProgressBarMode } from '@angular/material/progress-bar';
 
+type FontOrder = 'name' | 'weight' | 'proportions';
+
 @Component({
 	selector: 'app-root',
 	templateUrl: './app.component.html',
 	styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
 	constructor(
 		private fs: FileService,
 		private changes: ChangeDetectorRef,
 		private dialog: MatDialog,
-		private cookies: CookiesService
+		private cookies: CookiesService,
 	) {
 		this._groups[0] = this.currentGroup;
+	}
 
-		this.fontSizeIndex = cookies.getNumber('fontSize', this.fontSizeIndex, this.minFontSizeIndex, this.maxFontSizeIndex);
-		this.sampleText = cookies.getString('sampleText', this.sampleText);
+	private restoreSettings() {
+		this.fontSizeIndex = this.cookies.getNumber('fontSize', this.fontSizeIndex, this.minFontSizeIndex, this.maxFontSizeIndex);
+		this.sampleText = this.cookies.getString('sampleText', this.sampleText);
+		this._sortBy = this.cookies.getString('sortOrder', this._sortBy) as FontOrder;
+		this._gridCellSize = this.cookies.getObject('gridCellSize', this._gridCellSize);
+		// TODO: default font path
+		this._rootPath = this.cookies.getString('rootPath', this._rootPath);
+
+		this.updateItemSize();
+		this.applyFilter(this.filterText);
 	}
 
 	ngOnInit() {
+		this.cookies.ready.subscribe(() => this.restoreSettings());
 		// this.loadFonts();
 		this.updateItemSize();
+	}
+
+	ngOnDestroy() {
 	}
 
 	loadFonts(path?: string) {
@@ -73,12 +88,31 @@ export class AppComponent implements OnInit {
 		});
 	}
 
+	sortBy(order: FontOrder) {
+		if (this._sortBy !== order) {
+			this._sortBy = order;
+			this.sortFonts();
+			this.applyFilter(this.filterText);
+			this.cookies.setString("sortOrder", order);
+		}
+	}
+
 	sortFonts() {
-		// sort by names/weight
-		const names: (keyof FontObject)[] = [
-			'fontFamilyName', 'fontOrder', 'fontSubfamilyName', 'fileName', 'filePath'
-		];
-		this._fonts = _.sortBy(this._fonts, names);
+		switch (this._sortBy) {
+			case 'weight':
+				this._fonts.sort((a, b) => a.weight - b.weight);
+				break;
+			case 'proportions':
+				this._fonts.sort((a, b) => a.proportions - b.proportions);
+				break;
+			default:
+				// sort by names/weight
+				const names: (keyof FontObject)[] = [
+					'fontFamilyName', 'fontOrder', 'fontSubfamilyName', 'fileName', 'filePath'
+				];
+				this._fonts = _.sortBy(this._fonts, names);
+				break;
+		}
 	}
 
 	getFontCount(): number {
@@ -105,18 +139,24 @@ export class AppComponent implements OnInit {
 				designerURL: 'Designer URL',
 				license: 'License',
 				version: 'Version',
-				copyright: 'Copyright'
+				copyright: 'Copyright',
+				loadingStatus: 'Loading Error'
 			};
 			const getKeys = <T>(t: T): (keyof T)[] => Object.keys(t) as (keyof T)[];
 			this._fontInfo = _(getKeys(keys))
-				.filter(key => !!font.font.getEnglishName(key))
-				.map(key => ({ name: keys[key], value: font.font.getEnglishName(key) }))
+				.filter(key => !!font.getEnglishName(key))
+				.map(key => ({ name: keys[key], value: font.getEnglishName(key) }))
 				.value();
 			this._fontInfo.push({ name: 'File Name', value: font.fileName });
-			const os2 = font.font.tables.os2;
+			const os2 = font.tables.os2;
 			if (os2) {
-				this._fontInfo.push({ name: 'Flags', value: `Weight ${os2.usWeightClass}, Width ${os2.usWidthClass}, Glyphs: ${font.font.numGlyphs} ` });
+				this._fontInfo.push({ name: 'Flags', value: `Weight ${os2.usWeightClass}, Width ${os2.usWidthClass}, Glyphs: ${font.numGlyphs}` });
 			}
+			const created = font.tables.head?.created;
+			if (created > 0) { // negative timestamp (date before 1970) is typically bogus, so ignoring it
+				this._fontInfo.push({ name: 'Created', value: (new Date(created * 1000)).toLocaleDateString() });
+			}
+			// this._fontInfo.push({ name: 'W', value: `Weight ${font.weight}, Prop ${font.proportions}` });
 		}
 	}
 
@@ -172,10 +212,11 @@ export class AppComponent implements OnInit {
 
 	setSampleText(text: string) {
 		this.sampleText = text;
+		this.cookies.setString('sampleText', text);
 		this.updateItemSize();
 	}
 
-	openGlyphPopup(data: { glyph: opentype.Glyph, font: opentype.Font }) {
+	openGlyphPopup(data: { glyph: opentype.Glyph, glyphs: ExtGlyph[], font: FontObject }) {
 		if (this._glyphPopup) {
 			// update on the fly
 			// todo if needed
@@ -183,27 +224,71 @@ export class AppComponent implements OnInit {
 		}
 
 		this._glyphPopup = this.dialog.open(GlyphComponent, {
-			width: '400px',
-			height: '400px',
+			width: '450px',
+			height: '470px',
 			data,
 			backdropClass: "none"
+		});
+
+		const showGlyph = (dir: 'next'|'prev') => {
+			const comp = this._glyphPopup?.componentInstance;
+			const glyph = comp?.glyph as ExtGlyph;
+			if (glyph && comp) {
+				const index = data.glyphs.indexOf(glyph); // glyph.orderedIndex;
+				const next = data.glyphs[index + (dir === 'next' ? +1 : -1)];
+				if (next) comp.glyph = next;
+			}
+
+		};
+
+		this._glyphPopup.afterOpened().subscribe(() => {
+			const comp = this._glyphPopup?.componentInstance;
+			comp?.goTo.subscribe((dir: any) => showGlyph(dir));
 		});
 
 		this._glyphPopup.afterClosed().subscribe(() => { delete this._glyphPopup; });
 	}
 
-	gridSizeChanged(size: { width: number, height: number }) {
-		//
+	gridSizeChanged(size: { width: number, height: number, sizeIndex: number }) {
+		this.cookies.setObject('gridSize', size.sizeIndex);
 	}
 
+	// color track of the font size slider
 	get colorTrack(): string {
 		const range = this.maxFontSizeIndex - this.minFontSizeIndex;
 		return `track-to-${Math.round(100 * (this.fontSizeIndex - this.minFontSizeIndex) / range)}`;
 	}
 
+	installFonts() {}
+	uninstallFonts() {}
+
+	selectFontFolder() {
+		const require = window.require;
+		if (!require) return;
+		const electron = require('electron');
+		const dialog = electron.remote.dialog;
+		const options = {
+			title: "Select font folder",
+			defaultPath: this.fs.getRootPath(),
+			properties: ['openDirectory'] as 'openDirectory'[]
+		};
+		const p = dialog.showOpenDialogSync(electron.remote.getCurrentWindow(), options);
+		console.log(p);
+		if (p && p.length === 1 && p[0]) {
+			// change folder view
+			this._rootPath = p[0];
+			this.cookies.setString('rootPath', this._rootPath);
+		}
+	}
+
+	getDisplayPath(): string {
+		return _.trim(this._rootPath, '/').replace(/\//g, ' \u2022 ');
+	}
+
 	_glyphPopup: MatDialogRef<GlyphComponent> | undefined;
 	@ViewChild('gallery') _gallery!: GalleryComponent;
 	@ViewChild('grid') _grid!: VirtualGridComponent;
+	_rootPath = '';
 	currentGroup = new GalleryGroup("", 0, []);
 	_groups: GalleryGroup[] = [];
 	galleryItemSize = { w: 200, h: 100 };
@@ -219,4 +304,7 @@ export class AppComponent implements OnInit {
 	operationProgress = 0;
 	operationMode: ProgressBarMode | undefined;
 	_pending: { cancel: () => void; } | undefined;
+	_sortBy: FontOrder = 'name';
+	_gridCellSize = 1;
+	_resize: ResizeObserver | undefined;
 }

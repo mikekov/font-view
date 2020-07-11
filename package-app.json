@@ -1,0 +1,12 @@
+
+{
+  "name": "font-view",
+  "productName": "Font Viewer",
+  "version": "0.0.0",
+  "main": "main.js",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "electron": "^9.0.5"
+  }
+}
