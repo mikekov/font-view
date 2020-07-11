@@ -1,10 +1,12 @@
 # FontView
 
+Simple cross-platform font viewer application.
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 9.1.7.
 
 ## Development server
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Run `npm start` for a dev server. Start Electron with "npm dbg". F5 to debug with VS Code.
 
 ## Code scaffolding
 
@@ -12,7 +14,7 @@ Run `ng generate component component-name` to generate a new component. You can 
 
 ## Build
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+Run `npm build` to build the project. The build artifacts will be stored in the `dist/` directory. Run `npm pack:linux` to create standalone executable.
 
 ## Running unit tests
 
